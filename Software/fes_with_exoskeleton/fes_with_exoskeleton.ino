@@ -10,9 +10,8 @@ Optional Features
   Have the fingers extend/flex in time with teh wrist
   Automatically setup the wrist angle measurements. 
     Take measurement initially, activate PWM, wait until fully extended, take extended measurement
-  
-
-
+  Add an EMG sensor when they have function to activate when they extend
+  Look at TENS unit material
 */
 
 
@@ -33,10 +32,9 @@ unsigned long us_per_sec = 1000000;
 #define period us_per_sec/freq
 
 bool on = false;
-bool exit = false;
+bool exit_program = false;
 
 const int cath_pin = 13;
-const int wrist_pin = -1;
 const int servo_pin = -1;
 const int wrist_pin = -1;
 
@@ -60,18 +58,18 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(exit){ //exit code
+  if(exit_program){ //exit code
+    Serial.println("Exiting program");
     return;
   }
 
   if(Serial.available()){ //check to see if new parameters have been input
     Serial.readBytes(valin, in_size);
-    Serial.print("You entered: ");
+    Serial.println("You entered: ");
     tokenize(valin, ' ');
-    Serial.println(parameters[0]);
-    Serial.println(parameters[1]);
-    Serial.println(parameters[2]);
-    Serial.println(pulse_width);
+    Serial.println("Pulse Width: " + String(parameters[0]));
+    Serial.println("Frequency: " + String(parameters[1]));
+    Serial.println("Amplitude: " + String(parameters[2]));
   }
 
 
@@ -87,7 +85,7 @@ void loop() {
 
 void tokenize(char* str, char delimiter){
   if(*str == 'c'){
-    exit = true;
+    exit_program = true;
   }
   char* token = strtok(str, " ");
   for(int i = 0; i < 3; i++){
